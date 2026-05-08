@@ -211,8 +211,11 @@ class SharedResources {
         }
 
         public void runToCompletion() {
+            boolean permitAcquired = false;
             // TODO: Similar synchronization needed here
             try {
+                SharedResources.cpuSemaphore.acquire();
+                permitAcquired = true;
                 System.out.println(Colors.BRIGHT_CYAN + "  ⚡ " + Colors.BOLD + Colors.CYAN + name +
                         Colors.RESET + Colors.BRIGHT_CYAN + " is the last process, running to completion" +
                         Colors.RESET + " [" + remainingTime + "ms]");
@@ -229,6 +232,11 @@ class SharedResources {
                 System.out.println();
             } catch (InterruptedException e) {
                 System.out.println(Colors.RED + "  ✗ " + name + " was interrupted." + Colors.RESET);
+            } finally {
+                // Release CPU semaphore after running to completion
+                if (permitAcquired) {
+                    SharedResources.cpuSemaphore.release();
+                }
             }
         }
 
