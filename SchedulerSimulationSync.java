@@ -120,10 +120,14 @@ class SharedResources {
 
         @Override
         public void run() {
+            boolean permitAcquired = false;
             // TODO #3: Acquire CPU semaphore before executing
             // This ensures only allowed number of processes run simultaneously
 
             try {
+                // Acquire CPU semaphore before process execution
+                SharedResources.cpuSemaphore.acquire();
+                permitAcquired = true;
                 if (startTime == -1) {
                     startTime = System.currentTimeMillis();
                 }
@@ -183,6 +187,10 @@ class SharedResources {
                 System.out.println();
 
             } finally {
+                // Release CPU semaphore after process execution
+                if (permitAcquired) {
+                    SharedResources.cpuSemaphore.release();
+                }
                 // TODO #4: Release CPU semaphore here
                 // Always release in finally block to prevent deadlocks!
             }
